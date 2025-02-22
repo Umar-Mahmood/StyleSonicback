@@ -10,7 +10,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
-    "get-image-colors": "^3.1.0",
+    "get-image-colors": "^1.0.0",
     "get-pixels": "^3.3.3",
     "multer": "^1.4.2",
     "path": "^0.12.7"
