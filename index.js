@@ -113,8 +113,46 @@ const getOutfitSuggestions = (season) => {
   return outfitColors[season] || ["No specific outfit recommendations."];
 };
 
-/** ✅ Upload Image, Extract Colors & Return Data */
 app.post("/upload", upload.single("image"), async (req, res) => {
+  // just upload and return the image id
+  try {
+    console.log("Processing image...");
+    console.log("Uploaded file:", req.file);
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const previousImageId = req.body.previousImageId;
+    if (previousImageId) {
+      const previousImagePath = path.join(
+        __dirname,
+        "uploads",
+        previousImageId
+      );
+      // delete previous image
+      fs.unlink(previousImagePath, (err) => {
+        if (err) {
+          console.error("Error deleting image:", err);
+        } else {
+          console.log("Image deleted:", previousImagePath);
+        }
+      });
+    }
+
+    const imageId = req.file.filename;
+    res.json({
+      success: true,
+      message: "Image uploaded",
+      imageId,
+    });
+  } catch (error) {
+    console.error("Error processing image:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** ✅ Upload Image, Extract Colors & Return Data */
+app.post("/analyse", upload.single("image"), async (req, res) => {
   try {
     console.log("Processing image...");
     console.log("Uploaded file:", req.file);
@@ -160,7 +198,13 @@ app.post("/upload", upload.single("image"), async (req, res) => {
       // 🔹 Determine season based on selected colors
       const detectedSeason = determineSeason(faceHsl, hairHsl, eyeHsl);
       const outfitSuggestions = getOutfitSuggestions(detectedSeason);
-
+      fs.unlink(imagePath, (err) => {
+        if (err) {
+          console.error("Error deleting image:", err);
+        } else {
+          console.log("Image deleted:", imagePath);
+        }
+      });
       res.json({
         message: "Image uploaded",
         imageId,
