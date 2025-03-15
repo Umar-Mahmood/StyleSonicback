@@ -226,6 +226,20 @@ app.post("/analyse", upload.single("image"), async (req, res) => {
 /** ✅ Serve Uploaded Images */
 app.use("/uploads", express.static("uploads"));
 
+app.delete("/delete/:imageId", (req, res) => {
+  const imageId = req.params.imageId;
+  const imagePath = path.join(__dirname, "uploads", imageId);
+
+  fs.unlink(imagePath, (err) => {
+    if (err) {
+      console.error("Error deleting image:", err);
+      return res.status(500).json({ error: "Error deleting image" });
+    }
+    console.log("Image deleted:", imagePath);
+    res.json({ success: true, message: "Image deleted" });
+  });
+});
+
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
